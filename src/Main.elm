@@ -1,7 +1,11 @@
 module Main exposing (main)
 
 import Browser exposing (Document)
-import Html exposing (main_, text)
+import Css exposing (..)
+import Css.Global exposing (generalSiblings, global)
+import Css.Reset exposing (ress)
+import Html.Styled exposing (Html, div, header, input, label, main_, nav, text, toUnstyled)
+import Html.Styled.Attributes exposing (css, for, id, type_)
 
 
 main : Program () Model Msg
@@ -52,6 +56,76 @@ view : Model -> Document Msg
 view _ =
     { title = ""
     , body =
-        [ main_ [] [ text "elm-supercell" ]
-        ]
+        List.map toUnstyled
+            [ global ress
+            , header
+                [ css
+                    [ displayFlex
+                    , justifyContent flexEnd
+                    , marginBottom (px 20)
+                    , borderBottom3 (px 1) solid (hex "#999")
+                    ]
+                ]
+                [ nav
+                    [ css [ displayFlex ] ]
+                    [ menuItem
+                        { id = "dropdown_1"
+                        , label = "menu 1"
+                        , flyoutContent = "flyout 1"
+                        }
+                    , menuItem
+                        { id = "dropdown_2"
+                        , label = "menu 2"
+                        , flyoutContent = "flyout 2"
+                        }
+                    ]
+                ]
+            , main_ [] [ text "elm-supercell" ]
+            ]
     }
+
+
+menuItem : { id : String, label : String, flyoutContent : String } -> Html msg
+menuItem item =
+    div [ css [ position relative ] ]
+        [ input
+            [ id item.id
+            , type_ "checkbox"
+            , css
+                [ marginRight (px 5)
+                , generalSiblings
+                    [ Css.Global.div [ display none ] ]
+                , Css.checked
+                    [ generalSiblings
+                        [ Css.Global.div [ display block ] ]
+                    ]
+                ]
+            ]
+            []
+        , label
+            [ for item.id
+            , css
+                [ display block
+                , padding2 (px 15) (px 15)
+                , cursor pointer
+                ]
+            ]
+            [ text item.label ]
+        , flyout item.flyoutContent
+        ]
+
+
+flyout : String -> Html msg
+flyout content =
+    div
+        [ css
+            [ position absolute
+            , top (px 60)
+            , right zero
+            , width (px 300)
+            , padding (px 15)
+            , backgroundColor (hex "#FFF")
+            , border3 (px 1) solid (hex "#666")
+            ]
+        ]
+        [ text content ]
